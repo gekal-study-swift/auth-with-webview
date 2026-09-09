@@ -22,7 +22,9 @@
 | --- | --- |
 | エントリポイント | `AuthWithWebView/AuthWithWebViewApp.swift` → `ContentView` |
 | 画面遷移（iOS） | 無し。`ContentView` は WebView を全面表示するだけ。フローは `web/` 側が持つ |
-| 画面遷移（Web） | App Router のページ 3 つ（`/` `/verify` `/result`）。状態は `web/app/auth-session.ts` が `sessionStorage` で持ち回す。共通枠は `app/components/app-frame.tsx` |
+| 画面遷移（Web） | App Router のページ 3 つ（`/` `/verify` `/result`）。共通枠は `app/components/app-frame.tsx` |
+| フロー状態（Web） | `web/app/atoms.ts` の Jotai atom（**メモリのみ・永続化なし**）。機微情報を残さない方針。リロードで消え、`app/components/flow-guard.tsx` がやり直しダイアログを出す |
+| WebView 復旧（iOS） | `webViewWebContentProcessDidTerminate` で再読込。上限は `LoadStateReducer.onContentProcessTerminated` |
 | JS ⇄ Native | `window.NativeAuth`（`setAppTheme` / `onVerified` / `getEnvInfo`）、Native→JS は `handleNativeAck` |
 | 純粋ロジック（iOS） | `LoadStateReducer`、`LinkPolicy`、`AppTheme` — Swift Testing で検証 |
 | 純粋ロジック（Web） | `web/app/auth.ts` — 電話番号の検証・整形、コード生成・照合 |

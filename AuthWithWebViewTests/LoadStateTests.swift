@@ -41,4 +41,15 @@ struct LoadStateTests {
         }
         #expect(LoadStateReducer.onHTTPError(.loaded, isForMainFrame: false, statusCode: 404) == .loaded)
     }
+
+    @Test func onContentProcessTerminated_reloadsUpToLimitThenErrors() {
+        #expect(LoadStateReducer.onContentProcessTerminated(retryCount: 1, limit: 3) == .loading)
+        #expect(LoadStateReducer.onContentProcessTerminated(retryCount: 3, limit: 3) == .loading)
+
+        if case .error = LoadStateReducer.onContentProcessTerminated(retryCount: 4, limit: 3) {
+            // 期待どおり：上限を超えたらエラー画面
+        } else {
+            Issue.record("再読込の上限を超えたら .error に遷移するべき")
+        }
+    }
 }

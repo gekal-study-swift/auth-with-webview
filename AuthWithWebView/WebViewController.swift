@@ -51,6 +51,9 @@ final class WebViewController: UIViewController {
     /// アプリ自身が読み込ませた URL（初回・再試行・空ページ）。リンク遷移と区別する。
     private var appRequestedURL: URL?
 
+    /// コンテンツプロセスが連続で落ちた回数。読み込み成功か手動再試行で 0 に戻す。
+    private var contentProcessTerminations = 0
+
     private var state: LoadState = .loading {
         didSet {
             guard state != oldValue else { return }
@@ -216,7 +219,10 @@ final class WebViewController: UIViewController {
         webView.load(URLRequest(url: url, cachePolicy: .reloadIgnoringLocalCacheData))
     }
 
-    @objc private func retry() { load(Self.makeRequestURL()) }
+    @objc private func retry() {
+        contentProcessTerminations = 0
+        load(Self.makeRequestURL())
+    }
 
     private func render() {
         switch state {
@@ -290,7 +296,26 @@ extension WebViewController: WKNavigationDelegate {
     }
 
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+        if webView.url != LoadStateReducer.blankURL {
+            contentProcessTerminations = 0
+        }
         state = LoadStateReducer.onPageFinished(state, url: webView.url)
+    }
+
+    /// メモリ逼迫などで WebView のコンテンツプロセスが落ちると、画面が真っ白のまま自動復帰しない。
+    /// 読み込み直して復帰させる（フロー途中の状態は失われるため、Web 側がやり直しを促す）。
+    /// 読み込むたびに落ちるページで無限ループにならないよう、``LoadStateReducer`` で上限を設ける。
+    func webViewWebContentProcessDidTerminate(_ webView: WKWebView) {
+        contentProcessTerminations += 1
+        let next = LoadStateReducer.onContentProcessTerminated(retryCount: contentProcessTerminations)
+        state = next
+
+        guard next == .loading else { return }
+        // 落ちた直後の再読込は同じ結果になりやすいので少し置く
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
+            guard let self, self.state == .loading else { return }
+            self.load(Self.makeRequestURL())
+        }
     }
 
     func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {

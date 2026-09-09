@@ -120,16 +120,22 @@ CI では `BASE_PATH=/auth-with-webview` を指定して `basePath` 付きでビ
 | --- | --- |
 | `app/page.tsx` / `app/verify/page.tsx` / `app/result/page.tsx` | ステップごとのページ（`/` → `/verify` → `/result`）。それぞれ別 URL・別 HTML |
 | `app/components/app-frame.tsx` | ヘッダ・ステッパー・ブリッジ・テーマ同期の共通枠（`layout.tsx` から使用） |
-| `app/auth-session.ts` | ステップ間で持ち回す状態（電話番号・コード・認証時刻）を `sessionStorage` に保持 |
+| `app/atoms.ts` | ステップ間で持ち回す状態（電話番号・コード・認証時刻）を **Jotai の atom（メモリのみ）** で保持。永続化しない |
+| `app/components/flow-guard.tsx` | `/verify` `/result` を包み、必要な状態が無ければ「セッションが切れました」ダイアログを出して `/` へ戻す |
 | `app/auth.ts` | 電話番号の正規化・検証・整形、ダミーコード生成・照合（純粋関数） |
 | `app/bridge-provider.tsx` | `window.NativeAuth` の検出とネイティブ呼び出し |
 | `app/components/phone-step.tsx` / `code-step.tsx` / `result-step.tsx` | 各画面のフォーム（ページから使う表示部品） |
 | `app/components/mock-sms-banner.tsx` | ダミー SMS（生成したコードを表示） |
 | `app/theme.ts` | MUI テーマ。色は `AuthWithWebView/AppTheme.swift` の `WebPalette` と同じ値 |
 
-ページ遷移は `next/navigation` の `router.push` で行い、`output: 'export'` + `trailingSlash: true` で
-`/verify/index.html` の形に書き出します。必要な状態が無いまま `/verify` や `/result` を直接開くと
-`/` へ戻します。
+ページ遷移は `next/navigation` の `router.push`、`output: 'export'` + `trailingSlash: true` で
+`/verify/index.html` の形に書き出します。
+
+**状態管理**：電話番号・認証コードは機微情報のため `sessionStorage` 等に残さず Jotai の atom
+（メモリのみ）で持ち回します。SPA 遷移・戻る/進むでは保持されますが、フルリロードや WebView の
+再生成で消えます。消えた場合は `FlowGuard` が検知してやり直しダイアログを出します（設計の詳細は
+`docs/state.md`）。iOS 側は、メモリ逼迫で WebView のコンテンツプロセスが落ちたときに
+`webViewWebContentProcessDidTerminate` で読み込み直し、フロー状態が消えても Web 側のダイアログに繋げます。
 
 ## 配色
 
@@ -143,3 +149,7 @@ WebView の背景を同じ色にして継ぎ目なく見せています。配色
 | 背景 | `#F2F6F5` | `#0E1414` |
 | サーフェス | `#FFFFFF` | `#161D1D` |
 | プライマリ | `#00695F` | `#5FD4C0` |
+
+## ドキュメント
+
+- [`docs/state.md`](docs/state.md) — 認証フローの状態管理（Jotai メモリのみ・やり直しダイアログ・WebView プロセス復旧）

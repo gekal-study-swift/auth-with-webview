@@ -42,6 +42,17 @@ enum LoadStateReducer {
         isForMainFrame ? .error(detail: httpErrorDetail(statusCode: statusCode)) : current
     }
 
+    /// WebView のコンテンツプロセスが強制終了されたとき（メモリ逼迫など）。
+    ///
+    /// そのままだと画面が真っ白のまま復帰しないため読み込み直す。ただし読み込むたびに
+    /// 落ちるページだと再読込ループになるので、`limit` 回まで（``loading``）に留め、
+    /// 超えたらエラー画面（``error(detail:)``）にしてユーザーの操作を待つ。
+    static func onContentProcessTerminated(retryCount: Int, limit: Int = 3) -> LoadState {
+        retryCount <= limit
+            ? .loading
+            : .error(detail: "表示を復元できませんでした。通信状況を確認して再試行してください。")
+    }
+
     /// キャンセル系のエラーか。
     ///
     /// - `NSURLErrorCancelled`: `decidePolicyFor` で `.cancel` を返したときなど
