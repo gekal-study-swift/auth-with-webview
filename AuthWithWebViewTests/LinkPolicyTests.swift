@@ -3,7 +3,7 @@ import Testing
 @testable import AuthWithWebView
 
 struct LinkPolicyTests {
-    private let targetHost = "auth-with-webview.ios.demo.gekal.cn"
+    private let targetHost = "gekal-study-swift.github.io"
 
     @Test func resolve_sameHostHTTPS_staysInWebView() {
         #expect(LinkPolicy.resolve(scheme: "https", host: targetHost, targetHost: targetHost) == .inWebView)

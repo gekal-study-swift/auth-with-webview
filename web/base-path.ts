@@ -1,9 +1,10 @@
 /**
  * 配信元のパス。
  *
- * カスタムドメイン (auth-with-webview.ios.demo.gekal.cn) でルート配信する前提のため既定は空。
- * `<user>.github.io/<repo>/` 形式のプロジェクトサイトに戻す場合は
- * `BASE_PATH=/auth-with-webview` を指定する。
+ * GitHub Pages のプロジェクトサイト（gekal-study-swift.github.io/auth-with-webview/）で
+ * 配信するため、本番ビルドでは `BASE_PATH=/auth-with-webview` を指定する
+ * （`.github/workflows/pages.yml` が設定）。ローカルの `next dev` は既定の空のまま
+ * ルート（http://localhost:3000/）で配信し、iOS の Debug ビルドもそれを読み込む。
  *
  * `next.config.ts` と、アイコンなど自前で URL を組み立てるメタデータの両方から参照する。
  */

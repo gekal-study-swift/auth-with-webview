@@ -27,7 +27,7 @@ pnpm --dir web dev            # http://localhost:3000
 
 `Debug` ビルドは `http://localhost:3000` を読み込む（`Supporting/Info.plist` の ATS 例外で
 localhost の平文 HTTP を許可している）。`Release` ビルドは配信サイト
-`https://auth-with-webview.ios.demo.gekal.cn/` を読み込むため、ローカルサーバーは不要。
+`https://gekal-study-swift.github.io/auth-with-webview/` を読み込むため、ローカルサーバーは不要。
 
 実機の `Debug` で動かす場合は、`localhost` が実機自身を指してしまうため、
 `AuthWithWebView/WebViewController.swift` の `targetURL` を Mac の LAN IP

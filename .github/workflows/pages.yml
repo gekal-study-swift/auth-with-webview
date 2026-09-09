@@ -40,6 +40,9 @@ jobs:
         run: pnpm build
         working-directory: web
         env:
+          # プロジェクトサイト（<org>.github.io/auth-with-webview/）で配信するため、
+          # リポジトリ名を basePath に指定する。カスタムドメインでルート配信するなら空にする。
+          BASE_PATH: /auth-with-webview
           # Repository variable を true にすると公開サイトで vConsole を有効化する。
           NEXT_PUBLIC_VCONSOLE: ${{ vars.NEXT_PUBLIC_VCONSOLE }}
       - name: Upload Pages artifact

@@ -79,7 +79,7 @@ xcodebuild build -project AuthWithWebView.xcodeproj -scheme AuthWithWebView \
   -destination 'platform=iOS Simulator,name=iPhone 16 Pro'
 ```
 
-- `Debug` は `http://localhost:3000`、`Release` は `https://auth-with-webview.ios.demo.gekal.cn/` を読み込みます。
+- `Debug` は `http://localhost:3000`、`Release` は `https://gekal-study-swift.github.io/auth-with-webview/` を読み込みます。
 - 実機の `Debug` では `localhost` が実機自身を指すため、`WebViewController.swift` の
   `targetURL` を Mac の LAN IP に書き換えるか `Release` を使ってください。
 - Deployment Target は iOS 26.0、Swift 5.0、Bundle ID は `cn.gekal.ios.AuthWithWebView`。
@@ -104,8 +104,11 @@ pnpm --dir web dev             # 開発サーバー
 pnpm --dir web build          # 静的サイトを web/out に生成
 ```
 
-`web/public/CNAME` に設定した `auth-with-webview.ios.demo.gekal.cn` のルートから配信する想定です。
-`main` への push 時に GitHub Actions がビルドして GitHub Pages へデプロイし、Pull Request ではビルドまで行います。
+GitHub Pages のプロジェクトサイト `https://gekal-study-swift.github.io/auth-with-webview/` で配信します。
+`main` への push 時に GitHub Actions（`.github/workflows/pages.yml`）がビルドしてデプロイし、
+Pull Request ではビルドまで行います。プロジェクトサイトはリポジトリ名がパスに入るため、
+CI では `BASE_PATH=/auth-with-webview` を指定して `basePath` 付きでビルドします
+（ローカルの `pnpm --dir web dev` は空のままルートで配信）。
 
 ### Web 側のファイル
 

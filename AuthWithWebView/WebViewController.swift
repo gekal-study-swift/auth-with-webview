@@ -11,7 +11,7 @@ final class WebViewController: UIViewController {
     #if DEBUG
     private static let targetURL = URL(string: "http://localhost:3000/")!
     #else
-    private static let targetURL = URL(string: "https://auth-with-webview.ios.demo.gekal.cn/")!
+    private static let targetURL = URL(string: "https://gekal-study-swift.github.io/auth-with-webview/")!
     #endif
 
     /// 配信元のホスト。これ以外の http(s) はアプリ内ブラウザ (SFSafariViewController) で開く。
