@@ -57,6 +57,11 @@ enum WebPalette {
     static let primary = UIColor { traits in
         traits.userInterfaceStyle == .dark ? UIColor(hex: 0x5FD4_C0) : UIColor(hex: 0x0069_5F)
     }
+
+    // ネイティブ版のフロー画面（NativeFlow/）でも同じ色を使う。
+    static var backgroundColor: Color { Color(background) }
+    static var surfaceColor: Color { Color(surface) }
+    static var primaryColor: Color { Color(primary) }
 }
 
 private extension UIColor {

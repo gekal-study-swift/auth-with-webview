@@ -1,11 +1,17 @@
 # auth-with-webview
 
-電話番号 → 6 桁コード → 結果確認、という SMS 認証の流れを **WKWebView 上の Web ページ**で動かす
-サンプルです。[`webview-interaction-sample`](https://github.com/gekal) と同じ構成
-（iOS シェル + Next.js の Web ページ）で、題材を「JS ⇄ Native ブリッジのデモ」から
-「認証フロー」に置き換えています。
+電話番号 → 6 桁コード → 結果確認、という SMS 認証の流れを、**同じフローの WebView 版と
+ネイティブ版**で並べて見比べられるサンプルです。アプリ下部のタブで切り替えます。
 
-**SMS は送信しません。** 「認証コードを送信」を押すと 6 桁のダミーコードを生成し、
+- **WebView 版** … `web/`（Next.js + MUI、静的エクスポート）を WKWebView で表示
+- **ネイティブ版** … `AuthWithWebView/NativeFlow/`（SwiftUI）で同じ 3 ステップを実装
+
+どちらも状態は**メモリのみ**（電話番号・コードを永続化しない）で、失われたら
+「セッションが切れました」でやり直させる、という同じ方針。差が出るのは
+「リロードで状態が消えるか」で、WebView 版は消える（→ ダイアログ）、ネイティブ版は
+通常消えない（比較用に「状態を破棄」ボタンで同じ状況を起こせる）。
+
+**SMS は送信しません。** 「認証コードを送信」で 6 桁のダミーコードを生成し、
 ダミー SMS として画面に表示します。それを入力すると認証成功になります。
 
 ## 画面の流れ
@@ -23,7 +29,8 @@ WebView 上で開くと、認証成功時にネイティブへ通知し、**触�
 
 | パス | 内容 |
 | --- | --- |
-| `AuthWithWebView/` | iOS アプリ本体（WKWebView シェル） |
+| `AuthWithWebView/` | iOS アプリ本体（WebView シェル + タブ） |
+| `AuthWithWebView/NativeFlow/` | ネイティブ版の認証フロー（SwiftUI） |
 | `AuthWithWebViewTests/` | UIKit に依存しないロジックのユニットテスト（Swift Testing） |
 | `Supporting/Info.plist` | localhost の平文 HTTP を許可する ATS 例外（Debug 用） |
 | `web/` | WebView に表示する Next.js + MUI のページ（静的エクスポート） |
@@ -35,15 +42,26 @@ WebView 上で開くと、認証成功時にネイティブへ通知し、**触�
 | ファイル | 役割 |
 | --- | --- |
 | `AuthWithWebViewApp.swift` | `@main`。`ContentView` を表示するだけ |
-| `ContentView.swift` | 配色の状態を持ち、`preferredColorScheme` で画面全体に適用する |
+| `ContentView.swift` | WebView 版 / ネイティブ版のタブ、配色の状態、`preferredColorScheme` |
 | `WebViewContainer.swift` | SwiftUI から `WebViewController` を使うためのラッパー |
-| `WebViewController.swift` | WKWebView の生成、`window.NativeAuth` ブリッジ、遷移の振り分け、読み込み状態 |
-| `AppTheme.swift` | 配色の種類・保存、Web (`web/app/theme.ts`) と揃えた色 |
+| `WebViewController.swift` | WKWebView の生成、`window.NativeAuth` ブリッジ、遷移の振り分け、読み込み状態、プロセス復旧 |
+| `AppTheme.swift` | 配色の種類・保存、Web (`web/app/theme.ts`) と揃えた色（SwiftUI `Color` も公開） |
 | `LoadState.swift` | 読み込み状態の遷移ロジック（純粋関数・テスト対象） |
 | `LinkPolicy.swift` | リンクをどこで開くかの判定（純粋関数・テスト対象） |
 | `Toast.swift` | 操作を妨げない短いメッセージ表示 |
 
-`LoadState.swift` と `LinkPolicy.swift` は UIKit に依存しないため、シミュレータや実機なしで検証できます。
+#### `NativeFlow/`（ネイティブ版）
+
+| ファイル | 役割 |
+| --- | --- |
+| `AuthFlowView.swift` | 3 ステップの入れ物。ステッパー・ステップ分岐・やり直しダイアログ |
+| `AuthFlowModel.swift` | `@Observable` の状態（メモリのみ）。`AuthStep` / `AuthFlowGuard`（純粋関数・テスト対象）も同居 |
+| `AuthLogic.swift` | 電話番号の正規化・検証・整形・マスク、ダミーコード生成・照合。`web/app/auth.ts` と同じ振る舞い（純粋関数・テスト対象） |
+| `PhoneEntryView.swift` / `CodeEntryView.swift` / `ResultView.swift` | 各ステップの画面 |
+| `MockSmsBanner.swift` / `AuthFlowComponents.swift` | ダミー SMS 表示、カード・ステッパー・行の共通部品 |
+
+`LoadState.swift` / `LinkPolicy.swift` / `AuthLogic.swift` / `AuthFlowGuard` は UIKit に依存しないため、
+シミュレータや実機なしで検証できます。
 
 ## ブリッジ API
 
@@ -96,9 +114,11 @@ xcodebuild build -project AuthWithWebView.xcodeproj -scheme AuthWithWebView \
 
 | ファイル | 内容 |
 | --- | --- |
-| `LoadStateTests.swift` | 読み込み状態の遷移（`about:blank` の除外、キャンセルとエラーの区別、サブフレームの HTTP エラー） |
+| `LoadStateTests.swift` | 読み込み状態の遷移（`about:blank` の除外、キャンセルとエラーの区別、HTTP エラー、コンテンツプロセス終了時の再読込上限） |
 | `LinkPolicyTests.swift` | 同一ホストか外部かの判定、ブラウザ表示に使えるスキームの制限 |
 | `AppThemeTests.swift` | 配色文字列の解釈と `UserDefaults` への保存 |
+| `AuthLogicTests.swift` | 電話番号の正規化・検証・整形・マスク、ダミーコード生成・照合（`web/app/auth.ts` と同じ結果） |
+| `AuthFlowGuardTests.swift` | 各ステップを表示してよいかの判定（`FlowGuard` と対） |
 
 ## Web 画面
 

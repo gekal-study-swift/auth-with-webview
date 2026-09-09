@@ -378,9 +378,8 @@ extension WebViewController: WKNavigationDelegate {
 
     private func openInAppBrowser(_ url: URL) {
         guard LinkPolicy.isBrowsableURL(scheme: url.scheme) else { return }
+        // iOS 26 で bar/control の色付けは非推奨（システムの背景効果に任せる）
         let safari = SFSafariViewController(url: url)
-        safari.preferredBarTintColor = WebPalette.surface
-        safari.preferredControlTintColor = WebPalette.primary
         present(safari, animated: true)
     }
 }

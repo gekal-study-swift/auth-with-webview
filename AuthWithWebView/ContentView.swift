@@ -7,13 +7,23 @@ struct ContentView: View {
     @State private var appTheme = ThemePreference.load()
 
     var body: some View {
-        WebViewContainer(
-            onAppThemeChanged: { theme in
-                appTheme = theme
-                ThemePreference.save(theme)
+        // 同じ認証フローを WebView 版とネイティブ版で並べ、動作を見比べられるようにする。
+        TabView {
+            Tab("WebView", systemImage: "globe") {
+                WebViewContainer(
+                    onAppThemeChanged: { theme in
+                        appTheme = theme
+                        ThemePreference.save(theme)
+                    }
+                )
+                .ignoresSafeArea()
             }
-        )
-        .ignoresSafeArea()
+
+            Tab("ネイティブ", systemImage: "iphone") {
+                AuthFlowView()
+            }
+        }
+        .tint(WebPalette.primaryColor)
         // ステータスバーとホームインジケータ周辺の配色もアプリの選択に追従させる。
         // 適用は SwiftUI の preferredColorScheme に一本化する。
         .preferredColorScheme(appTheme.colorScheme)

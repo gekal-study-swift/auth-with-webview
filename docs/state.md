@@ -1,6 +1,17 @@
 # 状態管理
 
-認証フロー（`/` → `/verify` → `/result`）で持ち回す状態の扱い。
+認証フロー（`/` → `/verify` → `/result`）で持ち回す状態の扱い。WebView 版とネイティブ版で
+**同じ方針**にしてあり、差が出るのは「リロードで状態が消えるか」だけ。
+
+| | WebView 版 | ネイティブ版 |
+| --- | --- | --- |
+| 状態の置き場 | Jotai atom（`web/app/atoms.ts`、メモリのみ） | `@Observable AuthFlowModel`（`NativeFlow/`、メモリのみ） |
+| ステップ間の保持 | ページ遷移・戻る/進むで保持 | `@State` 所有なので画面が生きている限り保持 |
+| リロードで消えるか | **消える**（フルリロード・WebView 再生成） | 通常は消えない。比較用に `discardState()` で再現 |
+| 消えたときの扱い | `FlowGuard` → 「セッションが切れました」ダイアログ → `/` | `AuthFlowGuard` → 同じダイアログ → ステップ 1 |
+| ガード判定 | `flow-guard.tsx` の `satisfied` | `AuthFlowGuard.canShow(_:phoneNumber:sentCode:verifiedAt:)`（純粋・テスト対象） |
+
+以下は WebView 版の詳細。
 
 ## 方針
 
