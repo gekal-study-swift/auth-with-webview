@@ -23,16 +23,21 @@ interface CodeStepProps {
 }
 
 export function CodeStep({ phoneNumber, sentCode, onResend, onVerified, onBack }: CodeStepProps) {
-  const [value, setValue] = useState('');
+  const [code, setCode] = useState('');
   const [failed, setFailed] = useState(false);
 
-  const digits = value.replace(/\D/g, '').slice(0, CODE_LENGTH);
-  const complete = digits.length === CODE_LENGTH;
+  const complete = code.length === CODE_LENGTH;
+
+  // 入力は数字だけを受け付ける（貼り付けやハードウェアキーボードで英字が来ても落とす）。
+  function handleChange(next: string) {
+    setCode(next.replace(/\D/g, '').slice(0, CODE_LENGTH));
+    setFailed(false);
+  }
 
   function handleSubmit(event: FormEvent) {
     event.preventDefault();
     if (!complete) return;
-    if (isCodeMatch(digits, sentCode)) {
+    if (isCodeMatch(code, sentCode)) {
       setFailed(false);
       onVerified();
     } else {
@@ -45,7 +50,7 @@ export function CodeStep({ phoneNumber, sentCode, onResend, onVerified, onBack }
       <MockSmsBanner
         code={sentCode}
         onResend={() => {
-          setValue('');
+          setCode('');
           setFailed(false);
           onResend();
         }}
@@ -66,18 +71,19 @@ export function CodeStep({ phoneNumber, sentCode, onResend, onVerified, onBack }
             <TextField
               label="6 桁の認証コード"
               placeholder="000000"
-              inputMode="numeric"
-              autoComplete="one-time-code"
-              value={digits}
-              onChange={(event) => {
-                setValue(event.target.value);
-                setFailed(false);
-              }}
+              value={code}
+              onChange={(event) => handleChange(event.target.value)}
               error={failed}
               helperText={failed ? 'コードが一致しません。もう一度入力してください' : ' '}
               slotProps={{
                 htmlInput: {
+                  // 数字キーボードを出す（iOS/Android とも inputmode=numeric でテンキー表示）。
+                  // type=text + inputmode=numeric + pattern は SMS 自動入力とも両立する組み合わせ。
+                  inputMode: 'numeric',
+                  pattern: '[0-9]*',
+                  autoComplete: 'one-time-code',
                   maxLength: CODE_LENGTH,
+                  'aria-label': '6 桁の認証コード（数字のみ）',
                   style: {
                     fontFamily: monoFontFamily,
                     fontSize: '1.5rem',
