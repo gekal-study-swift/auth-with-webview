@@ -7,12 +7,11 @@ import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import Link from '@mui/material/Link';
 import Stack from '@mui/material/Stack';
-import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 
 import { CODE_LENGTH, formatPhoneNumber, isCodeMatch } from '../auth';
-import { monoFontFamily } from '../theme';
 import { MockSmsBanner } from './mock-sms-banner';
+import { OtpInput } from './otp-input';
 
 interface CodeStepProps {
   phoneNumber: string;
@@ -68,38 +67,7 @@ export function CodeStep({ phoneNumber, sentCode, onResend, onVerified, onBack }
               </Typography>
             </Stack>
 
-            <TextField
-              label="6 桁の認証コード"
-              placeholder="000000"
-              // type=tel は iOS/Android とも電話ダイヤルパッド（数字のみ）を出す。
-              // このキーボードには予測変換・辞書・自動修正のバーが無いため、
-              // WKWebView 上でも入力が勝手に別の文字へ変わらない。MUI は type を input へ転送する。
-              type="tel"
-              value={code}
-              onChange={(event) => handleChange(event.target.value)}
-              error={failed}
-              helperText={failed ? 'コードが一致しません。もう一度入力してください' : ' '}
-              slotProps={{
-                htmlInput: {
-                  inputMode: 'numeric',
-                  pattern: '[0-9]*',
-                  // SMS 由来のコード自動入力（iOS の「メッセージから」）は残す。
-                  autoComplete: 'one-time-code',
-                  // 一方で、キーボードの辞書・予測変換・自動修正・自動大文字化は止める。
-                  autoCorrect: 'off',
-                  autoCapitalize: 'off',
-                  spellCheck: false,
-                  maxLength: CODE_LENGTH,
-                  'aria-label': '6 桁の認証コード（数字のみ）',
-                  style: {
-                    fontFamily: monoFontFamily,
-                    fontSize: '1.5rem',
-                    letterSpacing: '0.5em',
-                    textAlign: 'center',
-                  },
-                },
-              }}
-            />
+            <OtpInput length={CODE_LENGTH} value={code} onChange={handleChange} error={failed} />
 
             {failed && (
               <Alert severity="error" variant="outlined">

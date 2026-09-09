@@ -122,6 +122,7 @@ CI では `BASE_PATH=/auth-with-webview` を指定して `basePath` 付きでビ
 | `app/auth.ts` | 電話番号の正規化・検証・整形、ダミーコード生成・照合（純粋関数） |
 | `app/bridge-provider.tsx` | `window.NativeAuth` の検出とネイティブ呼び出し |
 | `app/components/phone-step.tsx` / `code-step.tsx` / `result-step.tsx` | 各画面 |
+| `app/components/otp-input.tsx` | 1 桁ずつのコード入力。iOS の予測変換・テキスト置換・自動修正が働かない |
 | `app/components/mock-sms-banner.tsx` | ダミー SMS（生成したコードを表示） |
 | `app/theme.ts` | MUI テーマ。色は `AuthWithWebView/AppTheme.swift` の `WebPalette` と同じ値 |
 
