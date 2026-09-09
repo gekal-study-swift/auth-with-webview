@@ -23,6 +23,23 @@ final class WebViewController: UIViewController {
     /// 配信元のホスト。これ以外の http(s) はアプリ内ブラウザ (SFSafariViewController) で開く。
     private static let targetHost = targetURL.host
 
+    /// 実際に読み込む URL。
+    ///
+    /// Debug では端末側や CDN の古いキャッシュを踏んで変更が反映されない事故を避けるため、
+    /// 読み込みのたびにユニークなクエリ (`_cb`) を足して必ず最新の HTML を取り直す。
+    /// Release は content-hash 付きの成果物なのでそのまま。
+    private static func makeRequestURL() -> URL {
+        #if DEBUG
+        guard var components = URLComponents(url: targetURL, resolvingAgainstBaseURL: false) else { return targetURL }
+        var items = components.queryItems ?? []
+        items.append(URLQueryItem(name: "_cb", value: String(Int(Date().timeIntervalSince1970))))
+        components.queryItems = items
+        return components.url ?? targetURL
+        #else
+        return targetURL
+        #endif
+    }
+
     /// WebView で選ばれた配色を SwiftUI 側に伝える。
     var onAppThemeChanged: ((AppTheme) -> Void)?
 
@@ -45,7 +62,21 @@ final class WebViewController: UIViewController {
         super.viewDidLoad()
         configureView()
         configureWebView()
-        load(Self.targetURL)
+        #if DEBUG
+        // 端末に残った旧バージョンの JS/CSS を確実に捨ててから読み込む（開発ビルド限定）。
+        URLCache.shared.removeAllCachedResponses()
+        let cacheTypes: Set<String> = [
+            WKWebsiteDataTypeDiskCache,
+            WKWebsiteDataTypeMemoryCache,
+            WKWebsiteDataTypeFetchCache,
+        ]
+        WKWebsiteDataStore.default().removeData(ofTypes: cacheTypes, modifiedSince: .distantPast) { [weak self] in
+            guard let self else { return }
+            self.load(Self.makeRequestURL())
+        }
+        #else
+        load(Self.makeRequestURL())
+        #endif
     }
 
     deinit {
@@ -185,7 +216,7 @@ final class WebViewController: UIViewController {
         webView.load(URLRequest(url: url, cachePolicy: .reloadIgnoringLocalCacheData))
     }
 
-    @objc private func retry() { load(Self.targetURL) }
+    @objc private func retry() { load(Self.makeRequestURL()) }
 
     private func render() {
         switch state {
