@@ -78,10 +78,14 @@ export function CodeStep({ phoneNumber, sentCode, onResend, onVerified, onBack }
               slotProps={{
                 htmlInput: {
                   // 数字キーボードを出す（iOS/Android とも inputmode=numeric でテンキー表示）。
-                  // type=text + inputmode=numeric + pattern は SMS 自動入力とも両立する組み合わせ。
                   inputMode: 'numeric',
                   pattern: '[0-9]*',
+                  // SMS 由来のコード自動入力（iOS の「メッセージから」）は残す。
                   autoComplete: 'one-time-code',
+                  // 一方で、キーボードの辞書・予測変換・自動修正・自動大文字化は止める。
+                  autoCorrect: 'off',
+                  autoCapitalize: 'off',
+                  spellCheck: false,
                   maxLength: CODE_LENGTH,
                   'aria-label': '6 桁の認証コード（数字のみ）',
                   style: {
