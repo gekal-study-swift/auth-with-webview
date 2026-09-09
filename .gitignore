@@ -30,3 +30,6 @@ web/next-env.d.ts
 
 # その他
 *.log
+*.swp
+*.swo
+*~

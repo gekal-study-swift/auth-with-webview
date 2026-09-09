@@ -79,9 +79,13 @@ xcodebuild build -project AuthWithWebView.xcodeproj -scheme AuthWithWebView \
   -destination 'platform=iOS Simulator,name=iPhone 16 Pro'
 ```
 
-- `Debug` は `http://localhost:3000`、`Release` は `https://gekal-study-swift.github.io/auth-with-webview/` を読み込みます。
-- 実機の `Debug` では `localhost` が実機自身を指すため、`WebViewController.swift` の
-  `targetURL` を Mac の LAN IP に書き換えるか `Release` を使ってください。
+- 既定では `Debug` / `Release` とも配信中の `https://gekal-study-swift.github.io/auth-with-webview/`
+  を読み込みます（実機でもシミュレータでもそのまま動く）。`Debug` は端末上でログを見るため
+  `?vconsole=1` を付けています。
+- ローカルの `web/` を確認するときは、別シェルで `pnpm --dir web dev` を動かしてから
+  `WebViewController.swift` の `Debug` 行を `http://localhost:3000/` に差し替えます
+  （localhost の平文 HTTP は `Supporting/Info.plist` の ATS 例外で許可済み。
+  実機では `localhost` が実機自身を指すため Mac の LAN IP にする）。
 - Deployment Target は iOS 26.0、Swift 5.0、Bundle ID は `cn.gekal.ios.AuthWithWebView`。
 
 ## テスト

@@ -7,9 +7,15 @@ import WebKit
 /// Web ページは `window.NativeAuth` を呼ぶ。iOS では `WKUserScript` で同名の API を注入し、
 /// `WKScriptMessageHandler` でネイティブに渡す。
 final class WebViewController: UIViewController {
-    /// 読み込むページ。Debug はローカルの `pnpm --dir web dev`、Release は配信中のサイト。
+    /// 読み込むページ。既定は配信中のサイト（実機でもシミュレータでもそのまま動く）。
+    /// Debug は端末上でログを見るため vConsole を有効化するクエリを付ける。
+    ///
+    /// ローカルの `web/` を確認するときは、別シェルで `pnpm --dir web dev` を動かしてから
+    /// 下の Debug 行を `http://localhost:3000/` に差し替える
+    /// （localhost の平文 HTTP は `Supporting/Info.plist` の ATS 例外で許可済み。
+    /// 実機の場合は `localhost` が実機自身を指すため Mac の LAN IP にする）。
     #if DEBUG
-    private static let targetURL = URL(string: "http://localhost:3000/")!
+    private static let targetURL = URL(string: "https://gekal-study-swift.github.io/auth-with-webview/?vconsole=1")!
     #else
     private static let targetURL = URL(string: "https://gekal-study-swift.github.io/auth-with-webview/")!
     #endif

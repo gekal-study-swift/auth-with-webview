@@ -14,24 +14,33 @@
 ## よく使う流れ
 
 ```shell
-# 1. WebView が読み込む Web ページのローカルサーバーを起動（別シェルで動かしたまま）
-pnpm --dir web install
-pnpm --dir web dev            # http://localhost:3000
-
-# 2. シミュレータに入れて起動
+# シミュレータに入れて起動（配信中の Web ページを読み込む。サーバー不要）
 ./scripts/simulator-install.sh --launch
 
-# 3. ロジックのユニットテスト
+# 実機に入れて起動（初回は Xcode で Signing の Team 設定が必要）
+./scripts/device-install.sh --launch
+
+# ロジックのユニットテスト
 ./scripts/test.sh
 ```
 
-`Debug` ビルドは `http://localhost:3000` を読み込む（`Supporting/Info.plist` の ATS 例外で
-localhost の平文 HTTP を許可している）。`Release` ビルドは配信サイト
+既定では `Debug` / `Release` とも配信サイト
 `https://gekal-study-swift.github.io/auth-with-webview/` を読み込むため、ローカルサーバーは不要。
+`Debug` は端末上でログを見るため `?vconsole=1` を付けている。
 
-実機の `Debug` で動かす場合は、`localhost` が実機自身を指してしまうため、
-`AuthWithWebView/WebViewController.swift` の `targetURL` を Mac の LAN IP
-（例: `http://192.168.1.10:3000/`）に書き換えるか、`Release` を使う。
+### ローカルの web/ を確認する場合
+
+別シェルでローカルサーバーを起動し、`WebViewController.swift` の `Debug` 行を差し替える。
+
+```shell
+pnpm --dir web install
+pnpm --dir web dev            # http://localhost:3000
+```
+
+`AuthWithWebView/WebViewController.swift` の `targetURL`（`#if DEBUG` 側）を
+`http://localhost:3000/` にする。localhost の平文 HTTP は `Supporting/Info.plist` の
+ATS 例外で許可済み。実機では `localhost` が実機自身を指すため、Mac の LAN IP
+（例: `http://192.168.1.10:3000/`）にする。
 
 ## 署名
 

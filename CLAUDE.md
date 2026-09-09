@@ -32,8 +32,12 @@
 
 - 配色の値は `web/app/theme.ts` と `AuthWithWebView/AppTheme.swift` の `WebPalette` で二重管理。
   片方を変えたら両方直す。
-- `Debug` は `http://localhost:3000`、`Release` は配信サイトを読む（`WebViewController.targetURL`）。
+- `WebViewController.targetURL` は既定で `Debug` / `Release` とも配信サイト
+  `https://gekal-study-swift.github.io/auth-with-webview/`（Debug は `?vconsole=1` 付き）。
+  ローカルの `web/` を見るときだけ `Debug` 行を `http://localhost:3000/` に差し替える。
   localhost の平文 HTTP は `Supporting/Info.plist` の ATS 例外で許可している。
+- 公開 URL はプロジェクトサイト（パスにリポジトリ名が入る）。CI は `BASE_PATH=/auth-with-webview`
+  を指定して `basePath` 付きでビルドする。`pnpm --dir web dev` は空のままルートで配信。
 - `Supporting/Info.plist` は同期グループ (`AuthWithWebView/`) の外に置くこと。中に入れると
   Copy Bundle Resources に二重登録されてビルドが失敗する。
 - `DEVELOPMENT_TEAM` は未設定。シミュレータは動く。実機は Xcode で Team を設定する。
