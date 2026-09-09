@@ -71,13 +71,16 @@ export function CodeStep({ phoneNumber, sentCode, onResend, onVerified, onBack }
             <TextField
               label="6 桁の認証コード"
               placeholder="000000"
+              // type=tel は iOS/Android とも電話ダイヤルパッド（数字のみ）を出す。
+              // このキーボードには予測変換・辞書・自動修正のバーが無いため、
+              // WKWebView 上でも入力が勝手に別の文字へ変わらない。MUI は type を input へ転送する。
+              type="tel"
               value={code}
               onChange={(event) => handleChange(event.target.value)}
               error={failed}
               helperText={failed ? 'コードが一致しません。もう一度入力してください' : ' '}
               slotProps={{
                 htmlInput: {
-                  // 数字キーボードを出す（iOS/Android とも inputmode=numeric でテンキー表示）。
                   inputMode: 'numeric',
                   pattern: '[0-9]*',
                   // SMS 由来のコード自動入力（iOS の「メッセージから」）は残す。
