@@ -20,7 +20,7 @@ struct ContentView: View {
             }
 
             Tab("ネイティブ", systemImage: "iphone") {
-                AuthFlowView()
+                AuthFlowView(appTheme: $appTheme)
             }
         }
         .tint(WebPalette.primaryColor)

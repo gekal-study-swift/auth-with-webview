@@ -54,7 +54,8 @@ WebView 上で開くと、認証成功時にネイティブへ通知し、**触�
 
 | ファイル | 役割 |
 | --- | --- |
-| `AuthFlowView.swift` | 3 ステップの入れ物。ステッパー・ステップ分岐・やり直しダイアログ |
+| `AuthFlowView.swift` | 3 ステップの入れ物。ヘッダー・ステッパー・ステップ分岐・やり直しダイアログ |
+| `AuthHeader.swift` | ヘッダー。WebView 版の `app-header.tsx` に合わせた見た目（ロック・タイトル・実装バッジ・配色トグル） |
 | `AuthFlowModel.swift` | `@Observable` の状態（メモリのみ）。`AuthStep` / `AuthFlowGuard`（純粋関数・テスト対象）も同居 |
 | `AuthLogic.swift` | 電話番号の正規化・検証・整形・マスク、ダミーコード生成・照合。`web/app/auth.ts` と同じ振る舞い（純粋関数・テスト対象） |
 | `PhoneEntryView.swift` / `CodeEntryView.swift` / `ResultView.swift` | 各ステップの画面 |
