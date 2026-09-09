@@ -7,6 +7,7 @@ import { AppRouterCacheProvider } from '@mui/material-nextjs/v16-appRouter';
 
 import { basePath } from '../base-path';
 import { BootStyle } from './boot-style';
+import { AppFrame } from './components/app-frame';
 import theme from './theme';
 import { VConsoleLoader } from './vconsole-loader';
 
@@ -41,7 +42,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <AppRouterCacheProvider options={{ key: 'mui' }}>
           <ThemeProvider theme={theme} defaultMode="system">
             <CssBaseline />
-            {children}
+            <AppFrame>{children}</AppFrame>
             <VConsoleLoader />
           </ThemeProvider>
         </AppRouterCacheProvider>

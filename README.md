@@ -118,12 +118,18 @@ CI では `BASE_PATH=/auth-with-webview` を指定して `basePath` 付きでビ
 
 | パス | 役割 |
 | --- | --- |
-| `app/page.tsx` / `components/auth-flow.tsx` | 3 画面のステートマシン（電話番号 → コード → 結果） |
+| `app/page.tsx` / `app/verify/page.tsx` / `app/result/page.tsx` | ステップごとのページ（`/` → `/verify` → `/result`）。それぞれ別 URL・別 HTML |
+| `app/components/app-frame.tsx` | ヘッダ・ステッパー・ブリッジ・テーマ同期の共通枠（`layout.tsx` から使用） |
+| `app/auth-session.ts` | ステップ間で持ち回す状態（電話番号・コード・認証時刻）を `sessionStorage` に保持 |
 | `app/auth.ts` | 電話番号の正規化・検証・整形、ダミーコード生成・照合（純粋関数） |
 | `app/bridge-provider.tsx` | `window.NativeAuth` の検出とネイティブ呼び出し |
-| `app/components/phone-step.tsx` / `code-step.tsx` / `result-step.tsx` | 各画面 |
+| `app/components/phone-step.tsx` / `code-step.tsx` / `result-step.tsx` | 各画面のフォーム（ページから使う表示部品） |
 | `app/components/mock-sms-banner.tsx` | ダミー SMS（生成したコードを表示） |
 | `app/theme.ts` | MUI テーマ。色は `AuthWithWebView/AppTheme.swift` の `WebPalette` と同じ値 |
+
+ページ遷移は `next/navigation` の `router.push` で行い、`output: 'export'` + `trailingSlash: true` で
+`/verify/index.html` の形に書き出します。必要な状態が無いまま `/verify` や `/result` を直接開くと
+`/` へ戻します。
 
 ## 配色
 

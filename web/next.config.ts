@@ -8,6 +8,9 @@ import { basePath } from './base-path';
  */
 const nextConfig: NextConfig = {
   output: 'export',
+  // ステップごとに /verify /result のページを持つため、静的ホスティングで
+  // 確実に配信できる `<route>/index.html` 形式で書き出す。
+  trailingSlash: true,
   basePath,
   assetPrefix: basePath || undefined,
   images: { unoptimized: true },

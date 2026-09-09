@@ -22,7 +22,7 @@
 | --- | --- |
 | エントリポイント | `AuthWithWebView/AuthWithWebViewApp.swift` → `ContentView` |
 | 画面遷移（iOS） | 無し。`ContentView` は WebView を全面表示するだけ。フローは `web/` 側が持つ |
-| 画面遷移（Web） | `web/app/components/auth-flow.tsx` の `Phase` ステートマシン（`phone` / `code` / `result`） |
+| 画面遷移（Web） | App Router のページ 3 つ（`/` `/verify` `/result`）。状態は `web/app/auth-session.ts` が `sessionStorage` で持ち回す。共通枠は `app/components/app-frame.tsx` |
 | JS ⇄ Native | `window.NativeAuth`（`setAppTheme` / `onVerified` / `getEnvInfo`）、Native→JS は `handleNativeAck` |
 | 純粋ロジック（iOS） | `LoadStateReducer`、`LinkPolicy`、`AppTheme` — Swift Testing で検証 |
 | 純粋ロジック（Web） | `web/app/auth.ts` — 電話番号の検証・整形、コード生成・照合 |
