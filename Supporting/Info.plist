@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<!--
+		Debug ビルドは http://localhost:3000 のローカル開発サーバー (pnpm --dir web dev) を
+		読み込むため、localhost に限って平文 HTTP を許可する。
+		Release ビルドは HTTPS の配信サイトを読むため、この例外は使われない。
+		その他のキー（起動画面・対応向きなど）は GENERATE_INFOPLIST_FILE がビルド時に補う。
+	-->
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSExceptionDomains</key>
+		<dict>
+			<key>localhost</key>
+			<dict>
+				<key>NSExceptionAllowsInsecureHTTPLoads</key>
+				<true/>
+			</dict>
+		</dict>
+	</dict>
+</dict>
+</plist>
