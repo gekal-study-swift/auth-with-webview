@@ -43,7 +43,9 @@ jobs:
           # Repository variable を true にすると公開サイトで vConsole を有効化する。
           NEXT_PUBLIC_VCONSOLE: ${{ vars.NEXT_PUBLIC_VCONSOLE }}
       - name: Upload Pages artifact
-        uses: actions/upload-pages-artifact@v3
+        # include-hidden-files（web/out/.nojekyll などを取り込む）は v3.0.1 以降のみ対応。
+        # `@v3` タグは v3.0.0 を指すため、明示的にパッチ版へ固定する。
+        uses: actions/upload-pages-artifact@v3.0.1
         with:
           path: web/out
           include-hidden-files: true
