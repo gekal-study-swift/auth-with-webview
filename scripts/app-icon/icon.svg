@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  アプリアイコンのベクタ原本。SMS 認証サンプルなので南京錠を意匠にしている。
+  背景はアプリ / WebView コンテンツと共通のティール（web/app/theme.ts の primary）。
+  中心 (54, 54) 基準で拡大している（iOS はセーフゾーンの縮小が不要）。
+  Dark / Tinted は scripts/app-icon/generate.sh が色を置換して生成する。
+-->
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 108 108">
+  <rect width="108" height="108" fill="#00695F" />
+
+  <g transform="translate(54 54) scale(1.22) translate(-54 -54)">
+    <!-- 弦（シャックル） -->
+    <path d="M42 52 v-7 a12 12 0 0 1 24 0 v7"
+          fill="none" stroke="#FFFFFF" stroke-width="7" stroke-linecap="round" />
+
+    <!-- 錠前の本体 -->
+    <rect x="33" y="49" width="42" height="33" rx="8" fill="#FFFFFF" />
+
+    <!-- 鍵穴 -->
+    <circle cx="54" cy="62" r="4.6" fill="#00695F" />
+    <path d="M54 62 L49.5 74 h9 z" fill="#00695F" />
+  </g>
+</svg>

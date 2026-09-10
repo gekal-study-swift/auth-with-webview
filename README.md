@@ -34,7 +34,7 @@ WebView 上で開くと、認証成功時にネイティブへ通知し、**触�
 | `AuthWithWebViewTests/` | UIKit に依存しないロジックのユニットテスト（Swift Testing） |
 | `Supporting/Info.plist` | localhost の平文 HTTP を許可する ATS 例外（Debug 用） |
 | `web/` | WebView に表示する Next.js + MUI のページ（静的エクスポート） |
-| `scripts/` | シミュレータ / 実機へのインストールとテスト実行 |
+| `scripts/` | シミュレータ / 実機へのインストール、テスト実行、アプリアイコン生成 |
 | `.github/workflows/pages.yml` | `web/` をビルドして GitHub Pages へデプロイ |
 
 ### iOS 側のファイル
@@ -170,6 +170,19 @@ WebView の背景を同じ色にして継ぎ目なく見せています。配色
 | 背景 | `#F2F6F5` | `#0E1414` |
 | サーフェス | `#FFFFFF` | `#161D1D` |
 | プライマリ | `#00695F` | `#5FD4C0` |
+
+## アプリアイコン
+
+`scripts/app-icon/icon.svg`（ティール地に南京錠）から、通常・ダーク・ティントの
+1024×1024 PNG を生成して `AuthWithWebView/Assets.xcassets/AppIcon.appiconset/` に置きます。
+意匠を変えたら SVG を編集して再実行してください。
+
+```shell
+./scripts/app-icon/generate.sh
+```
+
+生成には `rsvg-convert` が必要です（`brew install librsvg`）。ダークは `web/app/theme.ts` の
+ダーク primary（`#00302B` / `#5FD4C0`）、ティントはシステムが色を付けるためグレースケールで出力します。
 
 ## ドキュメント
 
