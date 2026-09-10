@@ -2,6 +2,7 @@ import SwiftUI
 
 /// ステップ 3: 結果確認。
 struct ResultView: View {
+    @Environment(\.colorScheme) private var scheme
     let model: AuthFlowModel
 
     var body: some View {
@@ -9,11 +10,13 @@ struct ResultView: View {
             VStack(spacing: 8) {
                 Image(systemName: "checkmark.circle.fill")
                     .font(.system(size: 52))
-                    .foregroundStyle(.green)
-                Text("認証が完了しました").font(.headline)
+                    .foregroundStyle(Palette.success(scheme == .dark))
+                Text("認証が完了しました")
+                    .font(.system(size: 15.6, weight: .bold))
+                    .tracking(-0.156)
                 Text("電話番号の確認が取れました。")
-                    .font(.callout)
-                    .foregroundStyle(.secondary)
+                    .font(.system(size: 14))
+                    .foregroundStyle(Palette.textSecondary(scheme == .dark))
             }
             .frame(maxWidth: .infinity)
             .padding(.vertical, 4)
@@ -28,15 +31,13 @@ struct ResultView: View {
 
             LabeledRow("実行環境", "ネイティブ（SwiftUI）")
             Text("Web 版と違い、リロードで状態が消える経路がありません。")
-                .font(.footnote)
-                .foregroundStyle(.secondary)
+                .font(.system(size: 14))
+                .foregroundStyle(Palette.textSecondary(scheme == .dark))
+                .fixedSize(horizontal: false, vertical: true)
 
-            Button("最初からやり直す") {
+            FlowButton(title: "最初からやり直す", filled: false) {
                 model.restart()
             }
-            .buttonStyle(.bordered)
-            .controlSize(.large)
-            .frame(maxWidth: .infinity)
         }
     }
 }
